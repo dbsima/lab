@@ -47,9 +47,9 @@ def CountOccurencesInText(word, text):
                 begin = text[i]
                 before_begin = text[i-1]
             else:
-                begin = text[0]
+                begin = "!"
                 before_begin = '!'
- 
+                
             # Calculate the end of the word
             if i + m + 1 < n:
                 end = text[i + m + 1]
@@ -58,13 +58,14 @@ def CountOccurencesInText(word, text):
                 else:
                     after_end = '!'
             else:
-                end = text[-1]
+                end = '!'
                 after_end = '!'
                 
             # If it's a word
-            if ((i == -1 and end in separators) or #Begining of text
-                ((i == n - m - 1) and begin in separators) or #End of text
-                ((begin in separators and end in separators) or 
+            is_end = end in separators
+            is_begin = begin in separators
+            if (
+                ((is_begin and is_end) or 
                   (begin == "'" and before_begin == begin) or
                   (end == "'" and after_end == end))
                ): # Normal word

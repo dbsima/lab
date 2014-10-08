@@ -6,7 +6,46 @@ import string
 ords = dict([(c, ord(c)) for c in string.printable])
 #print ords
 #separators = string.whitespace + ",.?!\"#$%&()*+-/:;<=>@[\]^_`{|}~" 
-separators = string.whitespace + ",.?!\"_():" 
+separators = string.whitespace + ",.?!\"_():"
+
+def preBmBc(x, m, ASIZE):
+    bmBc = ords
+
+    for i in range(0, m-1):
+        bmBc[x[i]] = m - i - 1
+        
+    return bmBc
+ 
+def suffixes(x, m):
+    suff = [0 for k in xrange(m)]
+    suff[m - 1] = m;
+    g = m - 1;
+    for i in range(m - 2, -1, -1):
+        if (i > g and suff[i + m - 1 - f] < i - g):
+            suff[i] = suff[i + m - 1 - f]
+        elif (i < g):
+            g = i;
+        f = i;
+        while (g >= 0 and x[g] == x[g + m - 1 - f]):
+            g = g -1
+        suff[i] = f - g;
+    return suff
+ 
+def preBmGs(x, m):
+    suff = suffixes(x, m);
+    #print suff
+    bmGs = [m for k in xrange(m)]
+    
+    j = 0;
+    for i in range(m-1, -1, -1):
+        if (suff[i] == i + 1):
+            while j < m - 1 - i:
+                if (bmGs[j] == m):
+                    bmGs[j] = m - 1 - i;
+                j = j + 1
+    for i in range(0, m-1):
+        bmGs[m - 1 - suff[i]] = m - 1 - i
+    return bmGs
 
 def CountOccurencesInText(word, text):
     """Number of occurences of word (case insensitive) in text"""
@@ -20,62 +59,69 @@ def CountOccurencesInText(word, text):
         return 0
     
     # Encode string to Ascii and transform to lower case
-    text = text.encode('ascii', 'ignore').lower()
+    y = text.encode('ascii', 'ignore').lower()
     
     # Transform string to lower case
-    word = word.lower()
- 
-    # Generating skip maps
-    skip = [m for k in xrange(256)]
+    x = word.lower()
+    
+    bmGs = preBmGs(x, m);
+    
+    bmBc = [m for k in xrange(256)]
     for k in xrange(m - 1):
-        skip[ords[word[k]]] = m - k - 1
- 
-    k = m - 1
-    counter = 0
- 
-    while k < n:
-        j = m - 1
-        i = k
-        # Check if we have a match backwards
-        while j >= 0 and text[i] == word[j]:
-            j -= 1
-            i -= 1
- 
-        if j == -1: # Matched! Now this part checks if it's a word and increments the counter.
-            # Calculate the begining of the word
-            if i > 0:
-                begin = text[i]
-                before_begin = text[i-1]
+        bmBc[ords[x[k]]] = m - k - 1
+    #print bmBc
+    
+    j = 0
+    u = 0
+    count = 0
+    shift = m
+    
+    #print y
+    
+    while (j <= n - m):
+        i = m - 1
+        while (i >= 0 and x[i] == y[i + j]):
+            i = i - 1
+            if (u != 0 and i == m - 1 - shift):
+                i -= u
+        if (i < 0): 
+            if i + j < 0:
+                begin = "!"
+                before_begin = "!"
             else:
-                begin = text[0]
-                before_begin = '!'
- 
-            # Calculate the end of the word
-            if i + m + 1 < n:
-                end = text[i + m + 1]
-                if i + m + 2 < n:
-                    after_end = text[i + m + 2]
+                begin = y[i+j]
+                before_begin = y[i+j-1]
+            if i + j + m + 1 == n:
+                end = "!"
+                after_end = "!"
+            else:
+                end = y[i+j+m+1]
+                if i+j+m+2 == n:
+                    after_end = "!"
                 else:
-                    after_end = '!'
-            else:
-                end = text[-1]
-                after_end = '!'
-                
-            # If it's a word
-            if ((i == -1 and end in separators) or #Begining of text
-                ((i == n - m - 1) and begin in separators) or #End of text
-                ((begin in separators and end in separators) or 
-                  (begin == "'" and before_begin == begin) or
-                  (end == "'" and after_end == end))
-               ): # Normal word
-                counter += 1
-                k += m
-                continue
-
-        # Based on the order of the last char matched calculate skip
-        k += skip[ords[text[k]]]
-
-    return counter
+                    after_end = y[i+j+m+2]
+            #print begin + " - " + end
+            
+            if (begin in separators and end in separators or 
+                (begin == "'" and before_begin == begin) or
+                  (end == "'" and after_end == end)):
+                count += 1
+            shift = bmGs[0];
+            u = m - shift;
+        else:
+            v = m - 1 - i;
+            turboShift = u - v;
+            bcShift = bmBc[ords[y[i + j]]] - m + 1 + i;
+            shift = max(turboShift, bcShift);
+            shift = max(shift, bmGs[i]);
+            if (shift == bmGs[i]):
+                u = min(m - shift, v);
+            elif (turboShift < bcShift):
+                shift = max(shift, u + 1);
+            u = 0;
+        j += shift;
+    #print count
+    return count
 
 
 def testCountOccurencesInText():
@@ -173,7 +219,7 @@ Don't be left unprotected. Order your don SSSS3000 today!""" ) )
     assert ( 1 == CountOccurencesInText ( "Linguist", "__Linguist Specialist Found Dead on Laboratory Floor__" ))
     assert ( 1 == CountOccurencesInText ( "Linguist", "'''''Linguist Specialist Found Dead on Laboratory Floor'''''" ))
     assert ( 1 == CountOccurencesInText ( "Floor", """Look: ''Linguist Specialist Found Dead on Laboratory Floor'' is the headline today."""))
-
+    
     
 SampleTextForBench = """
 A Suggestion Box Entry from Bob Carter
