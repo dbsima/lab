@@ -30,10 +30,10 @@ def CountOccurencesInText(word, text):
         pos = text.index(word)        
         if (
             (text[pos-1] in string.letters if pos != 0 else False) or\
-            ((text[pos-1] in "'" and text[pos-2] in string.letters) if pos > 1 else False) or\
-            ((text[pos-1] in "'" and text[pos+m] in "'") if pos > 1 else False) or\
+            ((text[pos-1] == "'" and text[pos-2] in string.letters) if pos > 1 else False) or\
+            ((text[pos-1] == "'" and text[pos+m] == "'") if pos > 1 else False) or\
             (text[pos+m] in string.letters if pos + m < n else False) or\
-            ((text[pos+m] in "'" and text[pos+m+1] in string.letters) if pos + m + 1 < n else False)
+            ((text[pos+m] == "'" and text[pos+m+1] in string.letters) if pos + m + 1 < n else False)
            ):
             i = pos + m
             while True:
