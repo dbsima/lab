@@ -2,11 +2,6 @@
 # -*- coding: UTF-8 -*-
 
 import string
-# This is done to avoid using ord() call in the search function
-ords = dict([(c, ord(c)) for c in string.printable])
-#print ords
-#separators = string.whitespace + ",.?!\"#$%&()*+-/:;<=>@[\]^_`{|}~" 
-separators = string.whitespace + ",.?!\"_():" 
 
 def CountOccurencesInText(word, text):
     """Number of occurences of word (case insensitive) in text"""
