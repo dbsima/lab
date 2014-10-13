@@ -32,7 +32,7 @@ def CountOccurencesInText(word, text):
             while True:
                 if i >= n:
                     break
-                if (text[i] in "'-") or (text[i] in string.letters):
+                if (text[i] in "'") or (text[i] in string.letters):
                     i+=1
                 else:
                     break
