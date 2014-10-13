@@ -14,10 +14,8 @@ def CountOccurencesInText(word, text):
     if m > n:
         return 0
     
-    # Encode string to Ascii and transform to lower case
-    text = text.encode('ascii', 'ignore').lower()
-    
-    # Transform string to lower case
+    # Transform strings to lower case
+    text = text.lower()
     word = word.lower()
  
     count = 0
