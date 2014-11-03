@@ -10,6 +10,12 @@ In how many ways can you combine the coins to add up to 2 euros?
 
 count = 0
 total = 200
+
+def is_null(x):
+    if x == 0:
+        return "-"
+    return str(x)
+
 for a in range(total, -1, -200):
     for b in range(a, -1, -100):
         for c in range(b, -1, -50):
@@ -17,4 +23,6 @@ for a in range(total, -1, -200):
                 for e in range(d, -1, -10):
                     for f in range(e, -1, -5):
                         for g in range(f, -1, -2):
-                               count += 1
+                            count += 1
+
+print count
