@@ -2,6 +2,24 @@
 find . -type f -exec file -N -i -- {} + | sed -n 's!: video/[^:]*$!!p'
 
 
+### Graphical card
+
+## Remove nvidia*
+sudo apt-get remove --purge nvidia-*
+
+## Install Bumblebee Ubuntu 14.04
+
+sudo apt-get install bumblebee bumblebee-nvidia primus nvidia-331
+
+sudo apt-get install python-appindicator
+
+git clone https://github.com/Bumblebee-Project/bumblebee-ui.git
+cd bumblebee-ui
+sudo ./INSTALL
+
+# Go to Startup Applications and add 'bumblebee-indicator'
+
+# Now reboot
 
 
 ### Memory
