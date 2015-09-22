@@ -128,3 +128,37 @@ Memory Device
 	Part Number: Not Specified
 	Rank: Unknown
 	Configured Clock Speed: Unknown
+
+### Audio
+
+## Set HDMI sound output automatically on connect/disconnect
+
+# Create file /etc/udev/rules.d/hdmi_sound.rules as root with content:
+
+SUBSYSTEM=="drm", ACTION=="change", RUN+="/usr/local/bin/hdmi_sound_toggle"
+
+# Create a file /usr/local/bin/hdmi_sound_toggle as root with the content:
+
+#!/bin/sh
+USER_NAME=`who | grep "(:0)" | cut -f 1 -d ' '`
+USER_ID=`id -u $USER_NAME`
+HDMI_STATUS=`cat /sys/class/drm/card0/*HDMI*/status`
+
+export PULSE_SERVER="unix:/run/user/"$USER_ID"/pulse/native"
+
+if [ $HDMI_STATUS = "connected" ]
+then
+    sudo -u $USER_NAME pactl --server $PULSE_SERVER set-card-profile 0 output:hdmi-stereo+input:analog-stereo
+else
+    sudo -u $USER_NAME pactl --server $PULSE_SERVER set-card-profile 0 output:analog-stereo+input:analog-stereo
+fi
+
+# Then make it executable with chmod 0755 /usr/local/bin/hdmi_sound_toggle
+
+# I tried to make this script as generic as possible, but you still might need to change some lines, such as the HDMI_STATUS file path or the profiles used. You can see a list of profiles by running pactl list cards and looking under Profiles.
+
+# Note that the script failed for me when I removed the keyword "export" when setting PULSE_SERVER, I think pactl is looking for the env variable
+
+# Don't forget to reload your udev rules: sudo udevadm control --reload-rules
+
+# Update this script is updated for 14.04. Before that, you would use USER_NAME instead of USER_ID everywhere
